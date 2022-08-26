@@ -36,16 +36,16 @@ miRNOme_out.df <- vroom(miRNOme_out)
 colnames(miRNOme_out.df)[1] <- "GeneID"
 
 #Get transcript stable ID version
-miRNOme_out.df <- miRNOme_out.df %>%  mutate( `Transcript stable ID version` = str_match_all(GeneID, pattern = "ENST00000\\d+\\.\\d" ))
+miRNOme_out.df <- miRNOme_out.df %>%  mutate( `Transcript stable ID` = str_match_all(GeneID, pattern = "ENST00000\\d+\\.\\d" ))
 
-miRNOme_out.df <- miRNOme_out.df %>% mutate(`Transcript stable ID version` = 
-                                        as.character(`Transcript stable ID version`))
+miRNOme_out.df <- miRNOme_out.df %>% mutate(`Transcript stable ID` = 
+                                        as.character(`Transcript stable ID`))
 
 #Get only canonical targets 
 semi_join_miRNOme.df <-  semi_join(miRNOme_out.df, Ensemble_Canonical.df, 
-                                by =  "Transcript stable ID version")
+                                by =  "Transcript stable ID")
                          
-Output_file <- semi_join_miRNOme.df %>% select(-`Transcript stable ID version`)
+Output_file <- semi_join_miRNOme.df %>% select(-`Transcript stable ID`)
 
 
 #Get file data
@@ -69,9 +69,9 @@ lost_percent <- (lost_targets*100)/input_targets
 
 
 ### Get unique Transcripts IDs resume
-Canonical_transcripts <- Ensemble_Canonical.df %>%  pull(`Transcript stable ID version`) %>%  unique() %>% length()
-input_transcripts <- miRNOme_out.df %>%  pull(`Transcript stable ID version`) %>% unique() %>% length()
-output_transcripts <- semi_join_miRNOme.df %>%  pull(`Transcript stable ID version`) %>% unique() %>% length()
+Canonical_transcripts <- Ensemble_Canonical.df %>%  pull(`Transcript stable ID`) %>%  unique() %>% length()
+input_transcripts <- miRNOme_out.df %>%  pull(`Transcript stable ID`) %>% unique() %>% length()
+output_transcripts <- semi_join_miRNOme.df %>%  pull(`Transcript stable ID`) %>% unique() %>% length()
 lost_transcripts <- input_transcripts - output_transcripts
 retained_transcripts_percent <- (output_transcripts*100)/input_transcripts
 lost_transcripts_percent <- (lost_transcripts*100)/input_transcripts
