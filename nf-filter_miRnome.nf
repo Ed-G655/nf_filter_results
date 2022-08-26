@@ -294,9 +294,9 @@ def get_chrom = { file -> file.baseName.replaceAll(/.alt/,"")}
 
 
 					// 	RESUME TARGETS
-					RESUME_REPORT_REF_MP(FILTER_RESULTS_REF_MP.out.LOG, R_script_2)
-					RESUME_REPORT_REF_TS(FILTER_RESULTS_REF_TS.out.LOG, R_script_2)
-					RESUME_REPORT_ALT_TS(FILTER_RESULTS_ALT_TS.out.LOG, R_script_2)
-					RESUME_REPORT_ALT_MP(FILTER_RESULTS_ALT_MP.out.LOG, R_script_2)
+					RESUME_REPORT_REF_MP(FILTER_RESULTS_REF_MP.out.LOG.collect(), R_script_2)
+					RESUME_REPORT_REF_TS(FILTER_RESULTS_REF_TS.out.LOG.collect(), R_script_2)
+					RESUME_REPORT_ALT_TS(FILTER_RESULTS_ALT_TS.out.LOG.collect(), R_script_2)
+					RESUME_REPORT_ALT_MP(FILTER_RESULTS_ALT_MP.out.LOG.collect(), R_script_2)
 
 }
