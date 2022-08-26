@@ -4,9 +4,7 @@ library( "pacman" )
 #cargamos mas paquetes
 p_load( "vroom",
         "dplyr",
-        "ggplot2",
-        "purrr",
-        "VennDiagram")
+        "purrr")
 
 
 
