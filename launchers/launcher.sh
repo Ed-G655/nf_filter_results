@@ -2,15 +2,13 @@
 cd ../
 ref_dir="/bodega/projects/miRNome_project/analisis/100GMX/targets/ref_targets/"
 alt_dir="/bodega/projects/miRNome_project/analisis/100GMX/targets/alt_targets/"
-bed="/bodega/projects/miRNome_project/analisis/100GMX/hsa.bed"
-output_directory="$(dirname $ref_dir)/results"
+output_directory="/bodega/projects/miRNome_project/canonical_transcripts/results"
 
 echo -e "======\n Testing NF execution \n======" \
 && rm -rf $output_directory \
-&& nextflow run nf-compare-miRNome-pos.nf \
+&& nextflow run nf-filter_miRnome.nf \
 	--ref_dir $ref_dir \
   --alt_dir $alt_dir \
-	--bed $bed \
 	--output_dir $output_directory \
 	-resume \
 	-with-report $output_directory/`date +%Y%m%d_%H%M%S`_report.html \
