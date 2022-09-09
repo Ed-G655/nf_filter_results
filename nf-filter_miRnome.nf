@@ -251,6 +251,9 @@ Channel
 				.set{ EMSEMBL_TARGETS}
 
 
+// Define function to get chrom
+def get_chrom = { file -> file.baseName.replaceAll(/.alt/,"")}
+
 	/*	  Import modules */
 
 								/*POS-processing */
@@ -269,34 +272,25 @@ include{RESUME_REPORT as RESUME_REPORT_ALT_MP} from './modules/resume_report/mai
 
 /*  main pipeline logic */
 workflow  {
-/* pos-processing */
-// Define function to get chrom
-def get_chrom = { file -> file.baseName.replaceAll(/.alt/,"")}
 
-					// collect targets outputs
-					TARGETSCAN_REF = ts_ref_input.map{file -> tuple(file.baseName, file) }
-					TARGETSCAN_ALT = ts_alt_input.map{ file -> tuple(get_chrom(file), file) }
+		// collect targets outputs
+		TARGETSCAN_REF = ts_ref_input.map{file -> tuple(file.baseName, file) }
+		TARGETSCAN_ALT = ts_alt_input.map{ file -> tuple(get_chrom(file), file) }
 
-						MIRMAP_REF = mirmap_ref_input.map{file -> tuple(file.baseName, file) }
-						MIRMAP_ALT = mirmap_alt_input.map{ file -> tuple(get_chrom(file), file) }
+		MIRMAP_REF = mirmap_ref_input.map{file -> tuple(file.baseName, file) }
+		MIRMAP_ALT = mirmap_alt_input.map{ file -> tuple(get_chrom(file), file) }
 
-						// // join channels
-						// REF_TARGETS_TOOLS = TARGETSCAN_REF.join(MIRMAP_REF)
-						// ALT_TARGETS_TOOLS = TARGETSCAN_ALT.join(MIRMAP_ALT)
+		// 	FILTER_RESULTS TARGETS
+		FILTER_RESULTS_REF_MP(MIRMAP_REF, EMSEMBL_TARGETS, R_script_1)
+		FILTER_RESULTS_REF_TS(TARGETSCAN_REF, EMSEMBL_TARGETS, R_script_1)
 
+		FILTER_RESULTS_ALT_TS(MIRMAP_ALT, EMSEMBL_TARGETS, R_script_1)
+		FILTER_RESULTS_ALT_MP(TARGETSCAN_ALT, EMSEMBL_TARGETS, R_script_1)
 
-					// 	FILTER_RESULTS TARGETS
-					FILTER_RESULTS_REF_MP(MIRMAP_REF, EMSEMBL_TARGETS, R_script_1)
-					FILTER_RESULTS_REF_TS(TARGETSCAN_REF, EMSEMBL_TARGETS, R_script_1)
-
-					FILTER_RESULTS_ALT_TS(MIRMAP_ALT, EMSEMBL_TARGETS, R_script_1)
-					FILTER_RESULTS_ALT_MP(TARGETSCAN_ALT, EMSEMBL_TARGETS, R_script_1)
-
-
-					// 	RESUME TARGETS
-					RESUME_REPORT_REF_MP(FILTER_RESULTS_REF_MP.out.LOG.collect(), R_script_2)
-					RESUME_REPORT_REF_TS(FILTER_RESULTS_REF_TS.out.LOG.collect(), R_script_2)
-					RESUME_REPORT_ALT_TS(FILTER_RESULTS_ALT_TS.out.LOG.collect(), R_script_2)
-					RESUME_REPORT_ALT_MP(FILTER_RESULTS_ALT_MP.out.LOG.collect(), R_script_2)
+		// 	RESUME TARGETS
+		RESUME_REPORT_REF_MP(FILTER_RESULTS_REF_MP.out.LOG, R_script_2)
+		RESUME_REPORT_REF_TS(FILTER_RESULTS_REF_TS.out.LOG, R_script_2)
+		RESUME_REPORT_ALT_TS(FILTER_RESULTS_ALT_TS.out.LOG, R_script_2)
+		RESUME_REPORT_ALT_MP(FILTER_RESULTS_ALT_MP.out.LOG, R_script_2)
 
 }

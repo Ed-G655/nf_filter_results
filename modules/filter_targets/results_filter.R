@@ -11,7 +11,7 @@ args = commandArgs(trailingOnly=TRUE)
 
 #args[1] <-"10"
 
-#args[2] <-"Emsembl_Canonical_gd.tsv"
+#args[2] <-"Emsembl_Canonical.tsv"
 
 #args[3] <- "chr10.mirmapout"
 
@@ -32,11 +32,11 @@ Ensemble_Canonical.df <- vroom(Ensemble_Canonical)  %>% na.omit()
 #Load miRNA targets
 miRNOme_out.df <- vroom(miRNOme_out)
 
-#Rename first Column 
+ #Rename first Column 
 colnames(miRNOme_out.df)[1] <- "GeneID"
 
 #Get transcript stable ID version
-miRNOme_out.df <- miRNOme_out.df %>%  mutate( `Transcript stable ID` = str_match_all(GeneID, pattern = "ENST00000\\d+\\.\\d" ))
+miRNOme_out.df <- miRNOme_out.df %>%  mutate( `Transcript stable ID` = str_match_all(GeneID, pattern = "ENST00000\\d+" ))
 
 miRNOme_out.df <- miRNOme_out.df %>% mutate(`Transcript stable ID` = 
                                         as.character(`Transcript stable ID`))
@@ -63,32 +63,32 @@ write.table(x = Output_file,
 ### Write log file
 input_targets  <- as.integer(nrow(miRNOme_out.df))
 output_targets  <- nrow(semi_join_miRNOme.df)
-lost_targets <- input_targets - output_targets
+filtered_targets <- input_targets - output_targets
 retained_percent  <- (output_targets*100)/input_targets
-lost_percent <- (lost_targets*100)/input_targets
+filtered_percent <- (filtered_targets*100)/input_targets
 
 
 ### Get unique Transcripts IDs resume
 Canonical_transcripts <- Ensemble_Canonical.df %>%  pull(`Transcript stable ID`) %>%  unique() %>% length()
 input_transcripts <- miRNOme_out.df %>%  pull(`Transcript stable ID`) %>% unique() %>% length()
 output_transcripts <- semi_join_miRNOme.df %>%  pull(`Transcript stable ID`) %>% unique() %>% length()
-lost_transcripts <- input_transcripts - output_transcripts
+filtered_transcripts <- input_transcripts - output_transcripts
 retained_transcripts_percent <- (output_transcripts*100)/input_transcripts
-lost_transcripts_percent <- (lost_transcripts*100)/input_transcripts
+filtered_transcripts_percent <- (filtered_transcripts*100)/input_transcripts
 
 
 #### Write log dataframe
 log_file.df <- data_frame(chromosome,
                        input_targets, 
                        output_targets, 
-                       lost_targets, 
+                       filtered_targets, 
                        retained_percent, 
-                       lost_percent,
+                       filtered_percent,
                        input_transcripts,
                        output_transcripts,
-                       lost_transcripts,
+                       filtered_transcripts,
                        retained_transcripts_percent,
-                       lost_transcripts_percent)
+                       filtered_transcripts_percent)
 
 
 #Write filtered targets
